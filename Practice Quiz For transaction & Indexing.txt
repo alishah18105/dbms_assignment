@@ -1,0 +1,130 @@
+Quiz: Transactions + Indexes
+
+-----------------------------
+Q1. (Transactions – Rollback)
+-----------------------------
+
+There is a `products` table (id, name, price).
+Start a transaction:
+
+1. Insert a product `"Laptop", 80000`.
+2. Insert a product by mistake `"Mobile", "abc"`.
+3. Rollback so that both inserts are canceled.
+   👉 Write SQL queries.
+
+----------------
+Answer
+----------------
+
+BEGIN;
+INSERT INTO products(name,price)
+VALUES('Laptop',80000);
+
+INSERT INTO products(name,price)
+VALUES ('Mobile','abc');
+
+ROLLBACK;
+
+------------------------------
+Q2. (Transactions – Savepoint)
+------------------------------
+
+There is a `bank_accounts` table (account_id, balance).
+Start a transaction:
+
+1. Deduct Rs. 3000 from Account ID=1.
+2. Create a savepoint.
+3. Try to add Rs. 3000 to Account ID=999 (wrong id).
+4. Rollback to the savepoint.
+5. Now correctly add Rs. 3000 to Account ID=2.
+6. Commit the transaction.
+   👉 Write SQL queries.
+
+--------
+Answer
+--------
+
+BEGIN;
+
+UPDATE bank_accounts
+SET balance = balance - 3000
+WHERE account_id = 1;
+
+SAVEPOINT sp1;
+
+UPDATE bank_accounts
+SET balance = balance + 3000
+WHERE account_id = 999;
+
+ROLLBACK TO sp1;
+
+UPDATE bank_accounts
+SET balance = balance + 3000
+WHERE account_id = 2;
+
+COMMIT;
+---
+
+--------------------------------
+Q3. (Indexes – Creation & Usage)
+--------------------------------
+
+You have an `employees` table (emp_id, emp_name, department).
+
+1. Create an index on `emp_name`.
+2. Write a query that uses the index to find `emp_name = 'Sara'`.
+   👉 Write SQL queries.
+
+--------
+Answer
+--------
+
+CREATE INDEX idx_emp_name ON employees(emp_name);
+
+SELECT * FROM employees WHERE emp_name = 'Sara';
+
+--------------------------------------
+Q4. (Indexes – Seq Scan vs Index Scan)
+--------------------------------------
+
+You created an index on the `age` column in the `students` table.
+Explain why PostgreSQL will still use **Seq Scan** for this query:
+
+```sql
+SELECT * FROM students WHERE age BETWEEN 18 AND 24;
+```
+
+--------
+Answer
+--------
+
+Because there would be multiple rows having age between 18 to 24, so in such a scenario where multiple rows have to return PostgreSql use Seq Scan as it works 
+faster than Index Scan in such cases
+
+
+-------------------
+Q5. (Mixed Concept)
+-------------------
+
+There are two tables: `orders` and `payments`.
+Write a transaction that:
+
+1. Inserts a new order.
+2. Inserts the corresponding payment.
+3. If the payment insert fails, rollback the whole transaction.
+   Write SQL queries.
+
+--------
+Answer
+--------
+
+BEGIN;
+INSERT INTO orders(customer, payment)
+VALUES
+(1,'Ali',5000);
+
+INSERT INTO payments(order_idd,status)
+VALUES
+(1, 'paid');
+
+ROLLBACK;
