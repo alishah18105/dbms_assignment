@@ -122,10 +122,5 @@ VALUES ('1','paid');
 
 ROLLBACK;
 
-CREATE INDEX idx_students_name
-ON Student_Admission(student_name);
 
-EXPLAIN SELECT * 
-FROM Student_Admission 
-WHERE student_name = 'Ali';
 
